@@ -16,49 +16,55 @@
 
 #define DEBUG_PROG 
 
-#ifdef DEBUG_PROG
-  #define DEBUG_PRINTLN(x)  Serial.println(x)
-  #define DEBUG_PRINT(x)    Serial.print(x)
-#else
-  #define DEBUG_PRINTLN(x) 
-  #define DEBUG_PRINT(x)
-#endif
+ int blueS=2;   //Send setting
+int blueG=3;   //get setting
+SoftwareSerial mySerial(blueS, blueG); 
 
-
-EIoTCloudRestApi eiotcloud;
-
-// change those lines
-#define AP_USERNAME "xxxx"
-#define AP_PASSWORD "xxxx"
-#define INSTANCE_ID "xxxx"
+void setup() 
+{
+  Serial.begin(9600);   //Serial mornitering
+  mySerial.begin(9600); //bluetooth serial
+}
 
 
 
-#define REPORT_INTERVAL 1
-
-#define ONE_WIRE_BUS 2  // DS18B20 pin
-OneWire oneWire(ONE_WIRE_BUS);
-DallasTemperature DS18B20(&oneWire);
 
 
-#define CONFIG_START 0
-#define CONFIG_VERSION "v01"
 
-struct StoreStruct {
-  // This is for mere detection if they are your settings
-  char version[4];
-  // The variables of your settings
-  char token[41];
-  uint moduleId;
-  //bool tokenOk; // valid token  
-} storage = {
-  CONFIG_VERSION,
-  // token
-  "1234567890123456789012345678901234567890",
-  // The default module 0 - invalid module
-  0,
-  //0 // not valid
-};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ "event": "ECU_MAPPING_DATA",
+   "requestType": "POST", 
+   "json": { 
+	    "data": {"Horse_Power": "{{Horse_Power}}", "torque":
+              "{{torque}}",  "Ffuel_Less": "{{Fuel_Less}}"}, 
+	    "sdid": "Car_ECU_Infor", 
+	    "type": "message" 
+	    }, 
+   "headers": { 
+		"Content-Type": "application/json", 
+		"Authorization": "Bearer __ARTIK_DEVICE_TOKEN__" 
+	     }, 
+    "noDefaults": true 
+
+
+
+
+
 
 String moduleId = "";
 String parameterId = "";
@@ -160,13 +166,64 @@ void setup() {
 void loop() {
   float temp;
 
-  do {
-    DS18B20.requestTemperatures(); 
-    temp = DS18B20.getTempCByIndex(0);
-    DEBUG_PRINT("Temperature: ");
-    DEBUG_PRINTLN(temp);
-  } while (temp == 85.0 || temp == (-127.0));
+ 
+ 
+ 
+  String cmd = "AT+CIPSTART=\"TCP\",\"";
+  cmd += "url=dashboard.us.enableiot.com"; // server IP
+  cmd += "\",80";           // port: 80
+  ser.println(cmd);
+   
+  if(ser.find("Error")){
+    Serial.println("AT+CIPSTART error");
+    return;
+  }
+  
+  //String, Data setting for GET method
+  String getStr = "GET /update?api_key=";
+  getStr += apiKey;
+  getStr +="&field1=";
+  getStr += String(strTemp);
+  getStr += "\r\n\r\n";
+ 
+  // Send Data
+  cmd = "AT+CIPSEND=";
+  cmd += String(getStr.length());
+  ser.println(cmd);
 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+     
+}
 
 
   if (tempOld != temp)
